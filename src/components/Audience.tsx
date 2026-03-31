@@ -66,13 +66,13 @@ const Audience = () => {
     ];
 
     return (
-        <section id="para-quem" className="min-h-screen pt-28 pb-12 flex flex-col justify-center bg-black relative overflow-hidden" ref={ref}>
+        <section id="para-quem" className="md:min-h-screen pt-6 md:pt-28 pb-12 flex flex-col md:justify-center bg-black relative overflow-hidden" ref={ref}>
             <div className="container mx-auto px-4 md:px-6 relative z-10 w-full">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                     transition={{ duration: 0.6 }}
-                    className="max-w-4xl mx-auto text-center mb-16 md:mb-20"
+                    className="max-w-4xl mx-auto text-center mb-10 md:mb-20"
                 >
                     <SectionBadge icon={<Users className="w-4 h-4" />}>
                         Para Quem

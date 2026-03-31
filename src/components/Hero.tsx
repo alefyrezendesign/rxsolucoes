@@ -79,45 +79,32 @@ const Hero = () => {
         };
 
         const preloadImages = async () => {
-            // If on mobile, only load the first frame to save network/battery payload
-            const framesToLoad = isMobileRef.current ? 1 : FRAME_COUNT;
-            
-            // Pre-fill array
+            // Sempre carregamos uma base inicial rápida (keyframes)
+            const framesToLoad = FRAME_COUNT;
             imagesRef.current = new Array(framesToLoad);
 
-            if (isMobileRef.current) {
-                await loadBatch([0]);
-            } else {
-                // Phase 1: Load keyframes for quick functional scrub
-                const keyframes = Array.from({ length: 10 }, (_, i) => Math.round(i * (FRAME_COUNT - 1) / 9));
-                await loadBatch(keyframes);
-                
-                // Show first frame immediately after keyframes load
-                const canvas = canvasRef.current;
-                const ctx = canvas?.getContext('2d');
-                if (canvas && ctx && imagesRef.current[0]) {
-                    renderImageToCanvas(ctx, canvas, imagesRef.current[0]);
-                }
-
-                // Phase 2: Fill remaining frames in small batches
-                const remaining: number[] = [];
-                for (let i = 0; i < FRAME_COUNT; i++) {
-                    if (!keyframes.includes(i)) remaining.push(i);
-                }
-                const batchSize = 12;
-                for (let b = 0; b < remaining.length; b += batchSize) {
-                    await loadBatch(remaining.slice(b, b + batchSize));
-                }
-            }
-
-            setImagesLoaded(true);
-
-            // Print the first frame synchronously
+            // Phase 1: Load keyframes for quick functional scrub (10 frames)
+            const keyframes = Array.from({ length: 10 }, (_, i) => Math.round(i * (FRAME_COUNT - 1) / 9));
+            await loadBatch(keyframes);
+            
+            // Show first frame immediately after keyframes load
             const canvas = canvasRef.current;
             const ctx = canvas?.getContext('2d');
             if (canvas && ctx && imagesRef.current[0]) {
                 renderImageToCanvas(ctx, canvas, imagesRef.current[0]);
             }
+
+            // Phase 2: Fill remaining frames in small batches
+            const remaining: number[] = [];
+            for (let i = 0; i < FRAME_COUNT; i++) {
+                if (!keyframes.includes(i)) remaining.push(i);
+            }
+            const batchSize = 12;
+            for (let b = 0; b < remaining.length; b += batchSize) {
+                await loadBatch(remaining.slice(b, b + batchSize));
+            }
+
+            setImagesLoaded(true);
         };
 
         preloadImages();
@@ -193,7 +180,7 @@ const Hero = () => {
 
     // Roda toda vez que o array fracionário sofre overflow pra um frame novo
     useMotionValueEvent(activeFrameProgress, "change", (latestFractional) => {
-        if (!imagesLoaded || isMobileRef.current) return;
+        if (!imagesLoaded) return;
         
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
@@ -202,14 +189,25 @@ const Hero = () => {
         // Arredondar para o quadro exílio inteiro
         const frameIndex = Math.min(FRAME_COUNT - 1, Math.max(0, Math.round(latestFractional)));
         
-        // Ignora render se o quadro não mudou
+        // Ignora render se o quadro calculado não mudou
         if (frameIndex === currentIndexRef.current) return;
         currentIndexRef.current = frameIndex;
         
-        const img = imagesRef.current[frameIndex];
-        if (img && img.complete) {
-            // Em vez de piscar thread, usamos rAF() nativo p evitar engasgos 
-            requestAnimationFrame(() => renderImageToCanvas(ctx, canvas, img));
+        // Tenta achar a imagem do frame, mas caso o usuário faça scroll rápido antes das lacunas carregarem
+        // (comum no 3G Mobile), procuramos retroativamente o último "keyframe" já carregado no buffer para exibir
+        let renderImg = imagesRef.current[frameIndex];
+        
+        if (!renderImg || !renderImg.complete) {
+            for (let i = frameIndex - 1; i >= 0; i--) {
+                if (imagesRef.current[i] && imagesRef.current[i].complete) {
+                    renderImg = imagesRef.current[i];
+                    break;
+                }
+            }
+        }
+
+        if (renderImg && renderImg.complete) {
+            requestAnimationFrame(() => renderImageToCanvas(ctx, canvas, renderImg));
         }
     });
 
@@ -267,9 +265,12 @@ const Hero = () => {
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, ease: "easeOut" }}
-                                className="text-3xl sm:text-4xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tighter leading-[1.15] md:leading-[1.1] text-white max-w-5xl"
+                                className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tighter leading-[1.15] md:leading-[1.1] text-white max-w-5xl"
                             >
-                                Aceleramos o crescimento <br className="hidden md:block" /> conectando <motion.span style={{ color: useTransform(scrollYProgress, [0, 0.4], ['#ffffff', '#8B5CF6']) }}>oportunidades.</motion.span>
+                                Aceleramos <br className="block md:hidden" />
+                                o crescimento <br /> 
+                                conectando <br className="block md:hidden" /> 
+                                <motion.span style={{ color: useTransform(scrollYProgress, [0, 0.4], ['#ffffff', '#8B5CF6']) }}>oportunidades.</motion.span>
                             </motion.h1>
                         </div>
 

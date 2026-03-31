@@ -227,7 +227,7 @@ const RxAnalises = () => {
     };
 
     return (
-        <section id="rx-analises" className="pt-24 md:pt-32 pb-0 bg-[#000000] relative overflow-hidden flex flex-col" ref={ref}>
+        <section id="rx-analises" className="pt-2 md:pt-32 pb-0 bg-[#000000] relative overflow-hidden flex flex-col" ref={ref}>
             
             {/* Background Animado - Z-0: Contido apenas no final da seção (como divisor/fundo dos botões) */}
             <div ref={canvasContainerRef} className="absolute bottom-0 left-0 right-0 w-full h-[50vh] md:h-[65vh] z-0 pointer-events-none">
@@ -257,7 +257,7 @@ const RxAnalises = () => {
                     className="flex flex-col items-center text-center max-w-4xl mx-auto"
                 >
                     {/* Badge - increased margin for better breathing room */}
-                    <div className="relative z-20 mb-20">
+                    <div className="relative z-20 mb-2 md:mb-20">
                         <SectionBadge icon={<Search className="w-4 h-4" />}>
                             RX Análises
                         </SectionBadge>
@@ -270,7 +270,7 @@ const RxAnalises = () => {
                             only made visible when the user approaches this section */}
                         <div 
                             ref={splineContainerRef}
-                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[500px] h-[280px] sm:w-[500px] md:w-[700px] md:h-[400px] z-10 pointer-events-auto overflow-hidden"
+                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[500px] md:max-w-none h-[280px] sm:w-[500px] md:w-[780px] md:h-[460px] z-10 pointer-events-auto overflow-hidden"
                             style={{
                                 opacity: (splineVisible && splineLoaded) ? 1 : 0,
                                 transition: 'opacity 1s ease-in-out',
@@ -302,7 +302,7 @@ const RxAnalises = () => {
                         </div>
 
                         {/* Black HTML Title - sits BEHIND Spline */}
-                        <h2 className="relative z-0 text-3xl md:text-5xl font-bold text-[#000000] tracking-tight leading-tight pointer-events-none select-none" aria-hidden="true">
+                        <h2 className="relative z-0 text-3xl md:text-6xl lg:text-7xl font-bold text-[#000000] tracking-tight leading-tight pointer-events-none select-none max-w-4xl mx-auto" aria-hidden="true">
                             Antes de crescer, é preciso <br className="hidden md:block" /> 
                             <span className="text-[#000000]">enxergar com clareza.</span>
                         </h2>

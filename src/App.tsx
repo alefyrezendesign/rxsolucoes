@@ -45,7 +45,7 @@ const App = () => {
                 A negative top margin exactly matches the height of the sticky container above it (100vh).
                 This guarantees that Section 4 (Audience) overlaps Section 3 natively on scroll,
                 and the remaining sections scroll naturally without visual divisions or GSAP Pin bugs. */}
-            <div className="relative z-30 w-full bg-[#040409] -mt-[100vh]">
+            <div className="relative z-30 w-full bg-[#040409] mt-0 md:-mt-[100vh]">
                 <Suspense fallback={<SectionSkeleton />}>
                     {/* Audience is guaranteed to overlap because of the negative margin */}
                     <Audience />

@@ -1,7 +1,8 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useRef, useEffect, useCallback } from 'react';
 import { Workflow, CheckCircle2, ArrowRight, Settings2, BarChart3, Users } from 'lucide-react';
 import SectionBadge from './ui/SectionBadge';
 import { useSolutionsModal } from '../hooks/useSolutionsModal';
+import gsap from 'gsap';
 
 const step1Items = ['Diagnóstico do momento da empresa', 'Mapeamento de gargalos e oportunidades', 'Clareza para priorizar próximos passos', 'Direcionamento estratégico com mais segurança'];
 const step2Items = ['Conexão com parceiros estratégicos', 'Ampliação de oportunidades de negócio', 'Atuação integrada ao ecossistema RX', 'Mais aderência entre necessidade e solução'];
@@ -21,7 +22,7 @@ interface HorizontalCardProps {
 
 const HorizontalCard: React.FC<HorizontalCardProps> = ({ step, title, desc, items, visual: Visual, ctaHref, ctaTarget, ctaText, onCtaClick }) => {
     return (
-        <div className="w-[88vw] sm:w-[85vw] md:w-[60vw] lg:w-[45vw] flex-shrink-0 flex flex-col justify-center px-3 sm:px-4 md:px-6 relative group perspective-1000 py-4 sm:py-8">
+        <div className="w-[88vw] sm:w-[85vw] md:w-[60vw] lg:w-[45vw] flex-shrink-0 snap-center flex flex-col justify-center px-3 sm:px-4 md:px-6 relative group perspective-1000 py-4 sm:py-8">
             {/* Card Background Core & Content Wrapper */}
             <div className="relative w-full h-full min-h-[440px] sm:min-h-[480px] bg-white/5 rounded-3xl border border-white/10 overflow-hidden transition-all duration-500 ease-out group-hover:border-primary-500/50 group-hover:bg-[#0a0a14] group-hover:-translate-y-2 group-hover:shadow-[0_20px_50px_rgba(139,92,246,0.15)] flex flex-col p-6 md:p-10">
                 {/* Glow Follower Effect */}
@@ -93,6 +94,56 @@ const HorizontalCard: React.FC<HorizontalCardProps> = ({ step, title, desc, item
 // Forwarding ref to access the horizontal track div from the parent Transition orchestrator
 const HowItWorks = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((_props, ref) => {
     const { openModal: openSolutionsModal } = useSolutionsModal();
+    const bumpedRef = useRef(false);
+    
+    // Internal ref to access DOM properties while still supporting standard React forwarded ref API
+    const internalRef = useRef<HTMLDivElement>(null);
+    const setRefs = useCallback((node: HTMLDivElement) => {
+        internalRef.current = node;
+        if (typeof ref === 'function') {
+            ref(node);
+        } else if (ref) {
+            (ref as React.MutableRefObject<HTMLDivElement>).current = node;
+        }
+    }, [ref]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined' || window.innerWidth >= 768) return;
+        
+        const interval = setInterval(() => {
+            const el = internalRef.current;
+            if (!el) return;
+
+            // Se o scroll estiver no início (< 50px de margem), puxamos sutilmente a trilha toda
+            if (el.scrollLeft < 50) {
+                gsap.to(el, {
+                    x: -25,
+                    duration: 0.25,
+                    ease: "power2.out",
+                    yoyo: true,
+                    repeat: 1
+                });
+            }
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        if (window.innerWidth >= 768) return; // Só roda no mobile
+        
+        const el = e.currentTarget;
+        // Pega se chegou no fim com uma tolerância de 20px
+        const isEnd = (el.scrollLeft + el.clientWidth) >= (el.scrollWidth - 20);
+        
+        if (isEnd && !bumpedRef.current) {
+            bumpedRef.current = true;
+            // Força um pequeno scroll vertical nativo para revelar sutilmente a próxima seção
+            window.scrollBy({ top: 120, behavior: 'smooth' });
+        } else if (!isEnd) {
+            bumpedRef.current = false;
+        }
+    };
 
     return (
         <section id="como-funciona" className="relative w-full h-full pointer-events-none flex items-center bg-transparent pt-16 md:pt-20">
@@ -101,10 +152,15 @@ const HowItWorks = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
             <div className="overflow-hidden w-full h-full flex items-center relative">
                 
                 {/* The Horizontal Track (forwarded ref for GSAP to animate) */}
-                <div ref={ref} className="flex items-center gap-4 md:gap-8 pl-4 sm:pl-8 md:pl-24 lg:pl-32 pr-4 sm:pr-8 md:pr-24 lg:pr-32 will-change-transform w-max pointer-events-auto">
+                <div 
+                    ref={setRefs} 
+                    onScroll={handleScroll}
+                    className="flex items-stretch gap-4 md:gap-8 pl-4 sm:pl-8 md:pl-24 lg:pl-32 pr-4 sm:pr-8 md:pr-24 lg:pr-32 will-change-transform w-full md:w-max overflow-x-auto snap-x snap-mandatory md:overflow-visible md:snap-none pointer-events-auto"
+                    style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
+                >
                     
                     {/* Panel 1: Intro Narrativa */}
-                    <div className="w-[85vw] sm:w-[85vw] md:w-[60vw] lg:w-[45vw] flex-shrink-0 flex flex-col justify-center items-start px-2 sm:px-4 pl-4 sm:pl-0">
+                    <div className="w-[85vw] sm:w-[85vw] md:w-[60vw] lg:w-[45vw] flex-shrink-0 snap-center flex flex-col justify-center items-start px-2 sm:px-4 pl-4 sm:pl-0">
                         <SectionBadge icon={<Settings2 className="w-4 h-4" />} className="mb-4 md:mb-6">
                             Na prática
                         </SectionBadge>
@@ -159,8 +215,8 @@ const HowItWorks = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
                 </div>
                 
                 {/* Sombras de borda para não parecer cortado abruptamente */}
-                <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#040409] via-[#040409]/80 to-transparent pointer-events-none z-20" />
-                <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#040409] via-[#040409]/80 to-transparent pointer-events-none z-20" />
+                <div className="hidden md:block absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#040409] via-[#040409]/80 to-transparent pointer-events-none z-20" />
+                <div className="hidden md:block absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#040409] via-[#040409]/80 to-transparent pointer-events-none z-20" />
                 
             </div>
         </section>

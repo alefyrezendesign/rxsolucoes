@@ -60,7 +60,7 @@ const PartnerProgram = () => {
     ];
 
     return (
-        <section id="partner-program" className="flex flex-col justify-center pt-12 pb-12 md:pt-16 md:pb-16 bg-[#040409] relative overflow-visible" ref={ref}>
+        <section id="partner-program" className="flex flex-col justify-center pt-4 pb-12 md:pt-16 md:pb-16 bg-[#040409] relative overflow-visible" ref={ref}>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-[600px] bg-primary-600/10 blur-[150px] rounded-full pointer-events-none" />
 
             <div className="container mx-auto px-4 md:px-6 relative z-10">
