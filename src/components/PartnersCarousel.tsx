@@ -81,7 +81,7 @@ const PartnersCarousel = () => {
   }, [onScroll]);
 
   return (
-    <div className="w-full overflow-hidden pt-6 pb-2 md:pt-10 md:pb-4 bg-black">
+    <div className="w-full overflow-hidden pt-6 pb-4 md:pt-10 md:pb-4 bg-black">
 
       {/* ── Desktop track ──────────────────────────────── */}
       <div
@@ -114,7 +114,7 @@ const PartnersCarousel = () => {
             alt="Parceiros RX Soluções"
             onLoad={i === 0 ? measure : undefined}
             draggable={false}
-            className="h-8 sm:h-10 max-w-none object-contain select-none pointer-events-none flex-shrink-0"
+            className="h-20 sm:h-24 max-w-none object-contain select-none pointer-events-none flex-shrink-0"
           />
         ))}
       </div>
