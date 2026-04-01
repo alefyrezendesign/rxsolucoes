@@ -227,7 +227,7 @@ const RxAnalises = () => {
     };
 
     return (
-        <section id="rx-analises" className="pt-2 md:pt-32 pb-0 bg-[#000000] relative overflow-hidden flex flex-col" ref={ref}>
+        <section id="rx-analises" className="pt-2 md:pt-[70px] pb-0 bg-[#000000] relative overflow-hidden flex flex-col" ref={ref}>
             
             {/* Background Animado - Z-0: Contido apenas no final da seção (como divisor/fundo dos botões) */}
             <div ref={canvasContainerRef} className="absolute bottom-0 left-0 right-0 w-full h-[50vh] md:h-[65vh] z-0 pointer-events-none">

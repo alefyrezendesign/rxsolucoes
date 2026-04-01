@@ -14,6 +14,7 @@ import TransitionSceneAboutToMechanics from './components/TransitionSceneAboutTo
 const PartnerProgram = lazy(() => import('./components/PartnerProgram'));
 
 import RxAnalises from './components/RxAnalises';
+import PartnersCarousel from './components/PartnersCarousel';
 const Audience = lazy(() => import('./components/Audience'));
 const CTA = lazy(() => import('./components/CTA'));
 const Footer = lazy(() => import('./components/Footer'));
@@ -51,6 +52,7 @@ const App = () => {
                     <Audience />
                 </Suspense>
                 
+                <PartnersCarousel />
                 
                 <RxAnalises />
                 
